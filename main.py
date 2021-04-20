@@ -522,3 +522,4 @@ while run:
     pygame.display.update()
 
 pygame.quit()
+print("hi")
