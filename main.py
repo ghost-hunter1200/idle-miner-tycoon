@@ -3,24 +3,28 @@ import colorspy
 
 pygame.init()
 
+y = 0
 
 class Manager:
     def __init__(self, cost, m_type, index):
         self.level = 1
         self.type = m_type
+        self.equipped = False
         self.cost = cost
         self.offset = 300
         self.buffer = 10
-        self.width = 500
+        self.width = 430
         self.height = 100
         self.index = index
         self.x = 100
         self.y = self.offset + (self.height + self.buffer) * (self.index - 1)
-        print(self.y)
+        self.equip_button = Button(self.x + self.width + self.buffer, self.y, 100, 100, None, "Equip")
 
-    def draw(self):
-        pygame.draw.rect(win, colorspy.lime_green, (self.x, self.y, self.width, self.height))
-        draw_text(medium_font, self.type, (self.x + 60, self.y + 50), colorspy.black)
+    def draw(self, the_y):
+        if 150 < self.y + the_y < 900:
+            self.equip_button.draw(the_y)
+            pygame.draw.rect(win, colorspy.lime_green, (self.x, self.y + the_y, self.width, self.height))
+            draw_text(big_font, self.type, (self.x + 60, self.y + 50 + the_y), colorspy.black)
 
 
 class Mine:
@@ -30,8 +34,8 @@ class Mine:
         self.miners = 1
         self.worker_capacity = 400 * (10 ** (self.mine_no - 1))
         self.upgrade_cost = 100
-        self.manager_owned = False
-        self.manager_type = None
+        self.equipped_manager = None
+        self.equipped_manager_type = None
 
         self.width = 450
         self.height = 150
@@ -77,7 +81,7 @@ class Mine:
         for button in self.buttons:
             button.draw()
 
-        if not self.manager_owned:
+        if self.equipped_manager is not None:
             draw_text(small_font, "Equip", (self.x + 40, self.y + 110 + y), colorspy.black)
         else:
             draw_text(small_font, "Upgrade", (self.x + 40, self.y + 105 + y), colorspy.black)
@@ -247,6 +251,7 @@ class Mine:
     def work(self):
         global coins, managers, run, new_manager_cost
         win = pygame.display.set_mode((700, 1000))
+        the_y = 0
 
         running = True
         while running:
@@ -261,13 +266,26 @@ class Mine:
                     if e.button == 1:
                         if 50 < mouse_x < 64 + 50 and 50 < mouse_y < 64 + 50:
                             running = False
+                        for manager in managers:
+                            if manager.equip_button.mouse_hovered():
+                                self.equipped_manager = manager
+                                self.equipped_manager_type = manager.type
+                                for manager_ in managers:
+                                    manager_.y -= 110
+                                    manager.equip_button.y -= 110
+                    if e.button == 4 and len(managers) > 6:
+                        the_y -= 10
+                    if e.button == 5 and len(managers) > 6 and the_y < 0:
+                        the_y += 10
 
             win.fill((179, 185, 136))
 
-            pygame.draw.rect(win, (152, 194, 245), (50, 150, 600, 700), border_radius=25)
+            pygame.draw.rect(win, (152, 194, 245), (50, 150, 600, 840), border_radius=25)
 
             for manager in managers:
-                manager.draw()
+                if not manager.equipped:
+                    if self.equipped_manager != manager:
+                        manager.draw(the_y)
 
             draw_text(big_font, f"{number(coins)}", (350, 30), colorspy.black)
 
@@ -322,14 +340,14 @@ class Button:
         else:
             self.hovered_color = hovered_color
 
-    def draw(self):
+    def draw(self, the_y=y):
         if self.scrolling:
             if self.b_size > 0:
                 pygame.draw.rect(win, self.fg_color, (
-                self.x - self.b_size, self.y - self.b_size + y, self.w + self.b_size * 2, self.h + self.b_size * 2),
+                self.x - self.b_size, self.y - self.b_size + the_y, self.w + self.b_size * 2, self.h + self.b_size * 2),
                                  self.b_size, border_radius=15)
 
-            pygame.draw.rect(win, self.bg_color, (self.x, self.y + y, self.w, self.h))
+            pygame.draw.rect(win, self.bg_color, (self.x, self.y + the_y, self.w, self.h))
         else:
             if self.b_size > 0:
                 pygame.draw.rect(win, self.fg_color, (
@@ -344,10 +362,10 @@ class Button:
         else:
             self.bg_color = self.old_bg_color
 
-        self.draw_text()
+        self.draw_text(the_y)
 
         if not self.img is None:
-            self.draw_image()
+            self.draw_image(the_y)
 
     def mouse_hovered(self):
         xPos, yPos = pygame.mouse.get_pos()
@@ -362,16 +380,16 @@ class Button:
 
             return False
 
-    def draw_text(self):
+    def draw_text(self, the_y=y):
         text = self.text_font.render(self.text, True, self.text_color)
         if self.scrolling:
-            win.blit(text, (self.x + (self.w / 2) - text.get_width() / 2, y + self.y + (self.h / 2) - text.get_height() / 2))
+            win.blit(text, (self.x + (self.w / 2) - text.get_width() / 2, the_y + self.y + (self.h / 2) - text.get_height() / 2))
         else:
             win.blit(text, (self.x + (self.w / 2) - text.get_width() / 2, self.y + (self.h / 2) - text.get_height() / 2))
 
-    def draw_image(self):
+    def draw_image(self, the_y=y):
         img_rect = pygame.Rect(self.x + (self.w / 2) - self.img.get_width() / 2,
-                               self.y + (self.h / 2) - self.img.get_height() / 2 + y, self.img.get_width(),
+                               self.y + (self.h / 2) - self.img.get_height() / 2 + the_y, self.img.get_width(),
                                self.img.get_height())
         win.blit(self.img, img_rect)
 
@@ -466,7 +484,7 @@ def hire_manager():
 
 
 mines = [Mine(1)]
-coins = 100000000
+coins = 1000000000000000000
 
 new_mine_btn = Button(WIDTH - 120, 370, 100, 70, None, "New Mine", text_size=26)
 new_mine_cost = 500000
@@ -477,7 +495,6 @@ manager_height = 400
 managers = []
 new_manager_cost = 100000
 
-y = 0
 run = True
 while run:
     clock.tick(60)
