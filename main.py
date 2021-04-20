@@ -5,12 +5,22 @@ pygame.init()
 
 
 class Manager:
-    def __init__(self, cost, m_type):
+    def __init__(self, cost, m_type, index):
         self.level = 1
-        self.x = None
-        self.y = None
         self.type = m_type
         self.cost = cost
+        self.offset = 300
+        self.buffer = 10
+        self.width = 500
+        self.height = 100
+        self.index = index
+        self.x = 100
+        self.y = self.offset + (self.height + self.buffer) * (self.index - 1)
+        print(self.y)
+
+    def draw(self):
+        pygame.draw.rect(win, colorspy.lime_green, (self.x, self.y, self.width, self.height))
+        draw_text(medium_font, self.type, (self.x + 60, self.y + 50), colorspy.black)
 
 
 class Mine:
@@ -237,17 +247,13 @@ class Mine:
     def work(self):
         global coins, managers, run, new_manager_cost
         win = pygame.display.set_mode((700, 1000))
-        buttons = [Button(230, 400, 250, 150, create_manager, text_size=32, scrolling=False),
-                   Button(230, 600, 250, 150, create_manager, text_size=32, scrolling=False)]
-        text1a, text2a, text1b, text2b = "Hire Miner", "Hire Seller", number(new_manager_cost), number(new_manager_cost)
 
         running = True
         while running:
             for e in pygame.event.get():
 
                 if e.type == pygame.QUIT:
-                    running = False
-                    run = False
+                    run = running = False
 
                 if e.type == pygame.MOUSEBUTTONDOWN:
                     mouse_x, mouse_y = pygame.mouse.get_pos()
@@ -260,7 +266,10 @@ class Mine:
 
             pygame.draw.rect(win, (152, 194, 245), (50, 150, 600, 700), border_radius=25)
 
-            draw_text(big_font, f"{number(coins)}", (350, 250), colorspy.black)
+            for manager in managers:
+                manager.draw()
+
+            draw_text(big_font, f"{number(coins)}", (350, 30), colorspy.black)
 
             win.blit(self.back_arrow, (50, 50))
 
@@ -433,7 +442,7 @@ def hire_manager():
                         if button.mouse_hovered():
                             if coins >= new_manager_cost:
                                 coins -= new_manager_cost
-                                managers.append(Manager(new_manager_cost, text[buttons.index(button)][5:]))
+                                managers.append(Manager(new_manager_cost, text[buttons.index(button)][5:], len(managers)))
                                 new_manager_cost *= 20
                                 text[2] = text[3] = number(new_manager_cost)
 
