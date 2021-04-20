@@ -523,3 +523,4 @@ while run:
 
 pygame.quit()
 print("hi")
+print("hello")
