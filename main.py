@@ -270,13 +270,17 @@ class Mine:
                             if manager.equip_button.mouse_hovered():
                                 self.equipped_manager = manager
                                 self.equipped_manager_type = manager.type
-                                for manager_ in managers:
-                                    manager_.y -= 110
-                                    manager.equip_button.y -= 110
-                    if e.button == 4 and len(managers) > 6:
-                        the_y -= 10
-                    if e.button == 5 and len(managers) > 6 and the_y < 0:
+                                manager.equipped = True
+                                if self.equipped_manager is not None:
+                                    for manager_ in managers:
+                                        if manager_ != manager:
+                                            manager.equipped = False
+                                        manager_.y -= 110
+                                        manager_.equip_button.y -= 110
+                    if e.button == 4 and len(managers) > 6 and the_y < 0:
                         the_y += 10
+                    if e.button == 5 and len(managers) > 6:
+                        the_y -= 10
 
             win.fill((179, 185, 136))
 
