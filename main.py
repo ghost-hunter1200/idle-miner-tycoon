@@ -51,10 +51,10 @@ class Mine:
         self.selected_button = "x1"
 
         # Buttons
-        self.buttons = [Button(WIDTH - 120, self.y + 10, 60, 70, self.mine, "Mine!", text_size=24),
-                        Button(WIDTH - 120, self.y + 90, 60, 50, self.upgrade_screen, "Upgrade", text_size=20),
-                        Button(self.x + 10, self.y + 10, 60, 70, self.sell, text_size=24),
-                        Button(self.x + 10, self.y + 90, 60, 50, self.work, text_size=20)]
+        self.buttons = [Button(WIDTH - 120, self.y + 10, 60, 70, self.mine, "Mine!", text_size=24, scrolling=False),
+                        Button(WIDTH - 120, self.y + 90, 60, 50, self.upgrade_screen, "Upgrade", text_size=20, scrolling=True),
+                        Button(self.x + 10, self.y + 10, 60, 70, self.sell, text_size=24, scrolling=True),
+                        Button(self.x + 10, self.y + 90, 60, 50, self.work, text_size=20, scrolling=True)]
 
         # Images
         self.coal_img = pygame.transform.scale(pygame.image.load('assets/coal.png').convert_alpha(), (150, 150))
@@ -266,17 +266,21 @@ class Mine:
                     if e.button == 1:
                         if 50 < mouse_x < 64 + 50 and 50 < mouse_y < 64 + 50:
                             running = False
+
                         for manager in managers:
                             if manager.equip_button.mouse_hovered():
                                 self.equipped_manager = manager
                                 self.equipped_manager_type = manager.type
                                 manager.equipped = True
-                                if self.equipped_manager is not None:
-                                    for manager_ in managers:
-                                        if manager_ != manager:
-                                            manager.equipped = False
-                                        manager_.y -= 110
-                                        manager_.equip_button.y -= 110
+
+                                # if self.equipped_manager is not None:
+                                #     for manager_ in managers:
+                                #         if manager_ != manager:
+                                #             manager.equipped = False
+
+                                #         manager_.y -= 110
+                                #         manager_.equip_button.y -= 110
+
                     if e.button == 4 and len(managers) > 6 and the_y < 0:
                         the_y += 10
                     if e.button == 5 and len(managers) > 6:
