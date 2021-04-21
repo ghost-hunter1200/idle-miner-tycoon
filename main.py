@@ -16,11 +16,31 @@ class Manager:
         self.index = index
         self.x = 100
         self.y = self.offset + (self.height + self.buffer) * (self.index - 1)
-        print(self.y)
+        self.equiped = False
+        self.btn_text = "Equip"
+        self.text_color = colorspy.black
+
+        self.equip_btn = Button(self.x + 350, self.y + 10, 100, 80, None, text_size=32)
+
+        self.miner_img = pygame.image.load("assets/miner_employee.png").convert_alpha()
+        self.seller_img = pygame.image.load("assets/seller_employee.png").convert_alpha()
+        self.miner_icon = pygame.transform.scale(self.miner_img, (24, 90))
+        self.seller_icon = pygame.transform.scale(self.seller_img, (24, 90))
 
     def draw(self):
         pygame.draw.rect(win, colorspy.lime_green, (self.x, self.y, self.width, self.height))
-        draw_text(medium_font, self.type, (self.x + 60, self.y + 50), colorspy.black)
+
+        if self.type == "Miner":
+            win.blit(self.miner_icon, (self.x + 40, self.y + 5))
+            draw_text(medium_font, self.type, (self.x + 160, self.y + 50), colorspy.blue)
+        else:
+            win.blit(self.seller_icon, (self.x + 40, self.y + 5))
+            draw_text(medium_font, self.type, (self.x + 160, self.y + 50), colorspy.dark_green)
+
+        self.equip_btn.draw()
+        draw_text(medium_font, self.btn_text, (self.x + 400, self.y + 50), self.text_color)
+
+        draw_text(font, f"Level: {self.level}", (self.x + 250, self.y + 50), colorspy.black)
 
 
 class Mine:
@@ -31,7 +51,7 @@ class Mine:
         self.worker_capacity = 400 * (10 ** (self.mine_no - 1))
         self.upgrade_cost = 100
         self.manager_owned = False
-        self.manager_type = None
+        self.equiped_manager = None
 
         self.width = 450
         self.height = 150
@@ -262,6 +282,21 @@ class Mine:
                         if 50 < mouse_x < 64 + 50 and 50 < mouse_y < 64 + 50:
                             running = False
 
+                        for manager in managers:
+                            if manager.equip_btn.mouse_hovered() and not manager.equiped:
+                                manager.equiped = True
+                                manager.btn_text = "Equiped"
+                                manager.text_color = colorspy.red
+                                self.manager_owned = True
+                                self.equiped_manager = manager
+                                manager_index = managers.index(manager)
+
+                                for m in managers:
+                                    if not managers.index(m) == manager_index:
+                                        m.equiped = False
+                                        m.btn_text = "Equip"
+                                        m.text_color = colorspy.black
+
             win.fill((179, 185, 136))
 
             pygame.draw.rect(win, (152, 194, 245), (50, 150, 600, 700), border_radius=25)
@@ -466,7 +501,7 @@ def hire_manager():
 
 
 mines = [Mine(1)]
-coins = 100000000
+coins = 100000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
 
 new_mine_btn = Button(WIDTH - 120, 370, 100, 70, None, "New Mine", text_size=26)
 new_mine_cost = 500000
