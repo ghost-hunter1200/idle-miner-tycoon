@@ -101,7 +101,15 @@ class Mine:
         if not self.manager_owned:
             draw_text(small_font, "Equip", (self.x + 40, self.y + 110 + y), colorspy.black)
         else:
-            draw_text(small_font, "Upgrade", (self.x + 40, self.y + 105 + y), colorspy.black)
+        	draw_text(small_font, "Upgrade", (self.x + 40, self.y + 105 + y), colorspy.black)
+
+        	if self.equiped_manager.type == "Miner":
+        		win.blit(self.equiped_manager.miner_img, (self.x + 180, self.y + 60))
+        		self.mine()
+        	else:
+        		win.blit(self.equiped_manager.seller_img, (self.x + 180, self.y + 60))
+        		self.sell()
+
         draw_text(small_font, "Worker", (self.x + 40, self.y + 125 + y), colorspy.black)
 
         draw_text(small_font, "Sell!", (self.x + 40, self.y + 35 + y), colorspy.black)
@@ -251,8 +259,8 @@ class Mine:
         else:
             upgrades = 0
             while coins >= total_cost + upgrade_cost:
-                upgrade_cost = round(upgrade_cost * 1.5)
                 total_cost += upgrade_cost
+                upgrade_cost = round(upgrade_cost * 1.5)
                 upgrades += 1
 
                 if self.level + upgrades > 800:
@@ -504,7 +512,7 @@ def hire_manager():
 
 
 mines = [Mine(1)]
-coins = 100000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
+coins = 0
 
 new_mine_btn = Button(WIDTH - 120, 370, 100, 70, None, "New Mine", text_size=26)
 new_mine_cost = 500000
