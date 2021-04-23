@@ -17,6 +17,7 @@ class Manager:
         self.x = 100
         self.y = self.offset + (self.height + self.buffer) * (self.index - 1)
         self.equiped = False
+        self.equiped_mine = None
         self.btn_text = "Equip"
         self.text_color = colorspy.black
 
@@ -285,6 +286,7 @@ class Mine:
                         for manager in managers:
                             if manager.equip_btn.mouse_hovered() and not manager.equiped:
                                 manager.equiped = True
+                                manager.equiped_mine = self.mine_no
                                 manager.btn_text = "Equiped"
                                 manager.text_color = colorspy.red
                                 self.manager_owned = True
@@ -294,6 +296,7 @@ class Mine:
                                 for m in managers:
                                     if not managers.index(m) == manager_index:
                                         m.equiped = False
+                                        m.equiped_mine = None
                                         m.btn_text = "Equip"
                                         m.text_color = colorspy.black
 
